@@ -1,0 +1,142 @@
+name: Build Binaries
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-binary-linux-ubuntu-2004:
+    name: Build Binary for Linux (Ubuntu 20.04)
+    runs-on: ubuntu-20.04
+    
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8.6'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pyinstaller setuptools wheel twine
+          python -m pip install requests==2.25.0
+      - name: Build a onefile binary
+        run: |
+          pyinstaller --onefile cavalier.py
+      - name: Zip the binary file (semi-redundant, but lets me set the content type to application/zip reliably)
+        run: |
+          7za a -tzip cavalier-linux-x64.zip ./dist/cavalier
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./cavalier-linux-x64.zip
+          asset_name: cavalier-linux-x64.zip
+          asset_content_type: application/zip
+
+  build-binary-macos-10-15:
+    name: Build Binary for MacOS Catalina (10.15)
+    runs-on: macos-10.15
+    
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8.6'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pyinstaller setuptools wheel twine
+          python -m pip install requests==2.25.0
+      - name: Build a onefile binary
+        run: |
+          python -OO -m PyInstaller --clean --name cavalier --onefile cavalier/__main__.py
+      - name: Zip the binary file (semi-redundant, but lets me set the content type to application/zip reliably)
+        run: |
+          7za a -tzip cavalier-macos-catalina-x64.zip ./dist/cavalier
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./cavalier-macos-catalina-x64.zip
+          asset_name: cavalier-macos-catalina-x64.zip
+          asset_content_type: application/zip
+  
+  build-binary-macos-11-0:
+    name: Build Binary for MacOS Big Sur (11.0)
+    runs-on: macos-11.0
+    
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8.6'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pyinstaller setuptools wheel twine
+          python -m pip install requests==2.25.0
+      - name: Build a onefile binary
+        run: |
+          python -OO -m PyInstaller --clean --name cavalier --onefile cavalier/__main__.py 
+      - name: Zip the binary file (semi-redundant, but lets me set the content type to application/zip reliably)
+        run: |
+          7za a -tzip cavalier-macos-bigsur-x64.zip ./dist/cavalier
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./cavalier-macos-bigsur-x64.zip
+          asset_name: cavalier-macos-bigsur-x64.zip
+          asset_content_type: application/zip
+
+  build-binary-windows-x64:
+    name: Build Binary for Windows x64
+    runs-on: windows-2019
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8.6'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pyinstaller setuptools wheel twine
+          python -m pip install requests==2.25.0
+      - name: Build a onefile binary
+        run: |
+          python -OO -m PyInstaller --clean --name cavalier --onefile cavalier/__main__.py
+      - name: Zip the binary file (semi-redundant, but lets me set the content type to application/zip reliably)
+        run: |
+          7z a -tzip cavalier-windows-x64.zip ./dist/cavalier.exe
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./cavalier-windows-x64.zip
+          asset_name: cavalier-windows-x64.zip
+          asset_content_type: application/zip
