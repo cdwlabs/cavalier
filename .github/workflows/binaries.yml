@@ -27,6 +27,7 @@ jobs:
           pyinstaller --onefile cavalier.py
       - name: Zip the binary file (semi-redundant, but lets me set the content type to application/zip reliably)
         run: |
+          chmod +x ./dist/cavalier
           7za a -tzip cavalier-linux-x64.zip ./dist/cavalier
       - name: Upload Release Asset
         id: upload-release-asset 
@@ -61,6 +62,7 @@ jobs:
           python -OO -m PyInstaller --clean --name cavalier --onefile cavalier/__main__.py
       - name: Zip the binary file (semi-redundant, but lets me set the content type to application/zip reliably)
         run: |
+          chmod +x ./dist/cavalier
           7za a -tzip cavalier-macos-catalina-x64.zip ./dist/cavalier
       - name: Upload Release Asset
         id: upload-release-asset 
@@ -95,6 +97,7 @@ jobs:
           python -OO -m PyInstaller --clean --name cavalier --onefile cavalier/__main__.py 
       - name: Zip the binary file (semi-redundant, but lets me set the content type to application/zip reliably)
         run: |
+          chmod +x ./dist/cavalier
           7za a -tzip cavalier-macos-bigsur-x64.zip ./dist/cavalier
       - name: Upload Release Asset
         id: upload-release-asset 

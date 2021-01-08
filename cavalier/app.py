@@ -38,7 +38,7 @@ class Cavalier(Frame):
         self.username.grid(row = 2, column = 1)
         self.lpassword = Label(self, text = "Password")
         self.lpassword.grid(row = 3, column = 0)
-        self.password = Entry(self)
+        self.password = Entry(self, show="*")
         self.password.grid(row = 3, column = 1)
         self.launch = Button(self)
         self.launch["text"] = "Launch the Remote KVM Java Applet"
@@ -50,15 +50,14 @@ class Cavalier(Frame):
         # build the base uri for the api calls
         self.status.set("Building the API URI")
         self.lstatus.config(fg = "dark green")
-        root.update_idletasks()
+        self.parent.update_idletasks()
         cimc = self.cimc.get()
-        base = "https://{}".format(cimc)
         # check for an ipv6 literal and ensure it gets wrapped in brackets
         try:
-            cimc = inet_ntop(inet_pton(AF_INET6, cimc))
+            inet_pton(AF_INET6, cimc)
             base = "https://[{}]".format(cimc)
-        except:
-            pass
+        except OSError:
+            base = "https://{}".format(cimc)
         api = "{}/nuova".format(base)
         headers = { "Content-Type": "application/x-www-form-urlencoded" }
 
@@ -69,11 +68,11 @@ class Cavalier(Frame):
         res = requests.post(api, headers = headers, data = ET.tostring(aaaLogin, encoding = "unicode", method = "xml"), verify = False)
         if res.status_code == 200:
             self.status.set("Extracting the cookie!")
-            root.update_idletasks()
+            self.parent.update_idletasks()
             cookie = ET.fromstring(res.text).attrib["outCookie"]
 
             self.status.set("Setting up scheduled token refreshing!")
-            self.master.update_idletasks()
+            self.parent.update_idletasks()
             timing = round(int(ET.fromstring(res.text).attrib["outRefreshPeriod"]) * 0.90) * 1000
             self.sessions.append({
                 "cookie": cookie,
@@ -81,13 +80,13 @@ class Cavalier(Frame):
                 })
             
             self.status.set("Obtaining compute authorization tokens!")
-            root.update_idletasks()
+            self.parent.update_idletasks()
             aaaGetComputeAuthTokens = ET.Element("aaaGetComputeAuthTokens")
             aaaGetComputeAuthTokens.set("cookie", cookie)
             print(ET.tostring(aaaGetComputeAuthTokens, encoding = "unicode", method = "xml"))
             res = requests.post(api, headers = headers, data = ET.tostring(aaaGetComputeAuthTokens, encoding = "unicode", method = "xml"), verify = False)
             self.status.set("Building URL for Java Web Start to launch the KVM App!")
-            root.update_idletasks()
+            self.parent.update_idletasks()
             kvm = "{}/kvm.jnlp?{}".format(base, urlencode({
                 "cimcAddr": cimc,
                 "tkn1": ET.fromstring(res.text).attrib["outTokens"].split(",")[0],
@@ -96,9 +95,9 @@ class Cavalier(Frame):
             print(kvm)
             
             self.status.set("Launching the app via Java Web Start!")
-            root.update_idletasks()
+            self.parent.update_idletasks()
             viewer = Popen(["javaws", kvm])
-            self.master.after_idle(self.pman, api, cimc, cookie, headers, viewer)
+            self.parent.after_idle(self.pman, api, cimc, cookie, headers, viewer)
 
 
     def find(self, lst, key, val):
@@ -141,8 +140,6 @@ class Cavalier(Frame):
 
 
 def main():
-#if __name__ == "__main__":
-    #import pdb; pdb.set_trace()
     root = Tk()
     root.title("Cavalier")
     cavalier = Cavalier(root)
