@@ -1,7 +1,7 @@
 ---
 name: Run Test Suite
 
-on: [pull_request]
+on: [push, pull_request]
 
 jobs:
   run-tests-on-linux-ubuntu-2004:
