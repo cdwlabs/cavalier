@@ -1,3 +1,7 @@
+![Run Test Suite](https://github.com/cdwlabs/cavalier/workflows/Run%20Test%20Suite/badge.svg)
+![Build Binaries](https://github.com/cdwlabs/cavalier/workflows/Build%20Binaries/badge.svg)
+[![published](https://static.production.devnetcloud.com/codeexchange/assets/images/devnet-published.svg)](https://developer.cisco.com/codeexchange/github/repo/cdwlabs/cavalier)
+
 # Cavalier
 As physical hardware ages we end up reliant on firmware that is difficult to connect to. In particular older servers often have web interfaces that require Flash and Java be detected in the browser to both login to them and then launch a KVM session.
 
